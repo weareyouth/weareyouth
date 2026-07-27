@@ -1,0 +1,239 @@
+.focus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 50px;
+}
+
+.focus-card-elegant {
+  position: relative;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  height: 450px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  group: hover;
+}
+
+.focus-card-elegant:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+}
+
+.focus-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.focus-card-elegant:hover .focus-img {
+  transform: scale(1.05);
+}
+
+.focus-content {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.9) !important;
+  transition: var(--transition);
+}
+
+.focus-card-elegant:hover .focus-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  bottom: 25px;
+}
+
+.focus-content h3 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+}
+
+.focus-content p {
+  color: var(--text-gray);
+  font-size: 15px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.btn-link {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-link .arrow {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.btn-link:hover {
+  color: var(--primary);
+}
+
+.btn-link:hover .arrow {
+  transform: translateX(5px);
+}
+
+@media (max-width: 992px) {
+  .focus-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .focus-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modal Styles */
+.program-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.program-modal {
+  background: white;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  border-radius: var(--border-radius-lg);
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: var(--accent-gold);
+}
+
+.modal-header {
+  position: relative;
+  height: 250px;
+}
+
+.modal-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-header h2 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 40px 30px 20px;
+  margin: 0;
+  color: white;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  font-family: var(--font-heading);
+  font-size: 32px;
+}
+
+.modal-body {
+  padding: 30px;
+  text-align: left;
+}
+
+.modal-desc {
+  font-size: 16px;
+  color: var(--text-gray);
+  margin-bottom: 25px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.modal-section {
+  margin-bottom: 25px;
+}
+
+.modal-section h4 {
+  font-family: var(--font-heading);
+  color: var(--primary-dark);
+  font-size: 20px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent-gold);
+  display: inline-block;
+}
+
+.modal-section p {
+  color: var(--text-gray);
+  line-height: 1.6;
+}
+
+.modal-section ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-section ul li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 12px;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+.modal-section ul li::before {
+  content: '•';
+  color: var(--accent-gold);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 18px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

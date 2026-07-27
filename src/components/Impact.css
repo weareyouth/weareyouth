@@ -1,0 +1,114 @@
+.impact {
+  position: relative;
+  background-color: var(--primary-dark);
+  background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--bg-white);
+  padding: 120px 0;
+}
+
+.impact-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.85); /* Slate overlay */
+  z-index: 1;
+}
+
+.impact-content {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.impact-header {
+  max-width: 500px;
+}
+
+.text-white {
+  color: var(--bg-white) !important;
+}
+
+.text-white-50 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.stats-grid-elegant {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.stat-card-elegant {
+  padding: 40px 30px;
+  border-radius: var(--border-radius-lg);
+  opacity: 0;
+  transform: translateY(30px);
+  /* Use glass panel styles with slight adjustment */
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.stat-card-elegant:nth-child(2) {
+  transform: translateY(60px);
+  margin-top: 30px;
+}
+
+.stat-card-elegant:nth-child(4) {
+  transform: translateY(60px);
+  margin-top: 30px;
+}
+
+.animate-up {
+  animation: slideUpFadeElegant 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFadeElegant {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-value {
+  font-family: var(--font-heading);
+  font-size: 56px;
+  color: var(--bg-white);
+  margin-bottom: 5px;
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 1px;
+}
+
+@media (max-width: 992px) {
+  .impact-content {
+    grid-template-columns: 1fr;
+  }
+  .stat-card-elegant:nth-child(2),
+  .stat-card-elegant:nth-child(4) {
+    margin-top: 0;
+  }
+  .animate-up {
+    transform: translateY(0) !important; /* Reset offset for mobile */
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-grid-elegant {
+    grid-template-columns: 1fr;
+  }
+}
