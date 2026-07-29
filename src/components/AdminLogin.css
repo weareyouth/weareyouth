@@ -58,7 +58,7 @@
 .lock-icon-container {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, rgba(0, 174, 239, 0.15) 0%, rgba(212, 175, 55, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(0, 174, 239, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%);
   border: 1.5px solid rgba(0, 174, 239, 0.3);
   border-radius: 16px;
   display: flex;

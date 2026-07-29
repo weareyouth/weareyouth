@@ -12,8 +12,11 @@
 
 .header.scrolled {
   padding: 16px 0;
-  border-bottom: none;
-  /* Glass panel styles applied via utility class */
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-md);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 0;
   border-top: none;
   border-left: none;
@@ -21,14 +24,21 @@
 }
 
 .header-container {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 20px;
 }
 
 .header-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo {
+  flex-shrink: 0;
 }
 
 .logo h1 {
@@ -53,16 +63,18 @@
 
 .nav-links {
   display: flex;
-  gap: 36px;
+  gap: 20px;
+  align-items: center;
 }
 
 .nav-links a {
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-  font-size: 15px;
+  font-size: 13px;
   position: relative;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .header.scrolled .nav-links a {
@@ -112,7 +124,107 @@
   color: var(--primary);
 }
 
+/* Mobile Toggle Button */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--bg-white);
+  cursor: pointer;
+  z-index: 1001;
+  transition: var(--transition);
+}
+
+.header.scrolled .mobile-menu-toggle {
+  color: var(--primary-dark);
+}
+
+/* Mobile Nav Overlay Drawer */
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.98); /* Rich slate glassmorphic look */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 999;
+  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-nav-overlay.open {
+  right: 0;
+}
+
+.mobile-nav-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  width: 80%;
+  max-width: 400px;
+  padding: 40px 20px;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.mobile-nav-links a {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: var(--transition);
+}
+
+.mobile-nav-links a:hover {
+  color: var(--accent-gold);
+}
+
+.mobile-nav-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.mobile-nav-actions .btn {
+  width: 100%;
+}
+
 @keyframes spinGlobe {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+  .header-center,
+  .header-actions {
+    display: none !important;
+  }
+  
+  .header-container {
+    grid-template-columns: 1fr auto !important;
+  }
+  
+  .mobile-menu-toggle {
+    display: block !important;
+  }
+  
+  /* Keep hamburger white/cyan and always visible */
+  .header.menu-open .mobile-menu-toggle {
+    color: var(--accent-gold) !important;
+  }
 }

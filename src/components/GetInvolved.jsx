@@ -2,55 +2,63 @@ import React, { useState } from 'react';
 import './GetInvolved.css';
 
 const GetInvolved = ({ onAddVolunteer, onAddPartner, onAddFundraiser }) => {
-  const [modalType, setModalType] = useState(null); // 'volunteer', 'partner', 'fundraise'
+  const [modalType, setModalType] = useState(null); // Yeh track karta hai kaunsa modal open hai — 'volunteer', 'partner', ya 'fundraise'
   const [formData, setFormData] = useState({ 
     name: '', email: '', phone: '', role: '', message: '', company: '', type: '', amount: '' 
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (modalType === 'volunteer') {
-      if (!formData.name || !formData.email || !formData.phone || !formData.role) return;
-      onAddVolunteer({
-        id: Date.now(), 
-        name: formData.name, 
-        email: formData.email, 
-        phone: formData.phone, 
-        role: formData.role, 
-        message: formData.message || '',
-        status: 'Pending',
-        appliedAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-      });
-    } 
-    else if (modalType === 'partner') {
-      if (!formData.company || !formData.name || !formData.email || !formData.type) return;
-      onAddPartner({
-        id: Date.now(), 
-        company: formData.company, 
-        contact: formData.name, 
-        email: formData.email,
-        phone: formData.phone,
-        type: formData.type, 
-        status: 'Pending'
-      });
-    }
-    else if (modalType === 'fundraise') {
-      if (!formData.name || !formData.email || !formData.type || !formData.amount) return;
-      onAddFundraiser({
-        id: Date.now(), 
-        name: formData.name, 
-        email: formData.email,
-        phone: formData.phone,
-        type: formData.type, 
-        amount: formData.amount, 
-        status: 'Pending'
-      });
-    }
+    try {
+      if (modalType === 'volunteer') {
+        if (!formData.name || !formData.email || !formData.phone || !formData.role) return;
+        await onAddVolunteer({
+          id: Date.now(), 
+          name: formData.name, 
+          email: formData.email, 
+          phone: formData.phone, 
+          role: formData.role, 
+          message: formData.message || '',
+          status: 'Pending',
+          appliedAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        });
+        alert('Thank you! Your application has been submitted and an email notification has been sent to the foundation leader.');
+      } 
+      else if (modalType === 'partner') {
+        if (!formData.company || !formData.name || !formData.email || !formData.type) return;
+        await onAddPartner({
+          id: Date.now(), 
+          company: formData.company, 
+          contact: formData.name, 
+          email: formData.email,
+          phone: formData.phone,
+          type: formData.type, 
+          status: 'Pending'
+        });
+        alert('Thank you! Your partnership request has been submitted.');
+      }
+      else if (modalType === 'fundraise') {
+        if (!formData.name || !formData.email || !formData.type || !formData.amount) return;
+        await onAddFundraiser({
+          id: Date.now(), 
+          name: formData.name, 
+          email: formData.email,
+          phone: formData.phone || '',
+          type: formData.type, 
+          amount: formData.amount, 
+          message: formData.message || '',
+          status: 'Pending'
+        });
+        alert('Thank you! Your internship application has been submitted successfully.');
+      }
 
-    alert('Thank you! Your application has been submitted and an email notification has been sent to the foundation leader.');
-    setModalType(null);
-    setFormData({ name: '', email: '', phone: '', role: '', message: '', company: '', type: '', amount: '' });
+      setModalType(null);
+      setFormData({ name: '', email: '', phone: '', role: '', message: '', company: '', type: '', amount: '' });
+    } catch (err) {
+      const errMsg = err?.message || err?.text || (typeof err === 'string' ? err : JSON.stringify(err)) || 'Unknown error occurred';
+      alert("Error: " + errMsg);
+    }
   };
 
   const closeModal = () => {
@@ -76,24 +84,24 @@ const GetInvolved = ({ onAddVolunteer, onAddPartner, onAddFundraiser }) => {
               <button className="btn btn-glass" onClick={() => setModalType('partner')}>Partner With Us</button>
             </div>
             
-            <div className="involve-card-elegant highlight-card">
+            <div className="involve-card-elegant glass-panel-dark">
               <div className="involve-icon-elegant">🙌</div>
-              <h3 style={{color: 'var(--bg-white)'}}>Volunteer With Us</h3>
-              <p style={{color: 'rgba(255,255,255,0.9)'}}>Join our passionate network of volunteers and make a direct impact on the ground.</p>
-              <button className="btn btn-white" onClick={() => setModalType('volunteer')}>Apply Now</button>
+              <h3>Volunteer With Us</h3>
+              <p>Join our passionate network of volunteers and make a direct impact on the ground.</p>
+              <button className="btn btn-glass" onClick={() => setModalType('volunteer')}>Apply Now</button>
             </div>
             
             <div className="involve-card-elegant glass-panel-dark">
-              <div className="involve-icon-elegant">📢</div>
-              <h3>Fundraise</h3>
-              <p>Dedicate your special days or run campaigns to raise funds for our educational initiatives.</p>
-              <button className="btn btn-glass" onClick={() => setModalType('fundraise')}>Start Campaign</button>
+              <div className="involve-icon-elegant">🎓</div>
+              <h3>Internships</h3>
+              <p>Join our internship program to gain professional experience, develop skills, and make a real difference in communities.</p>
+              <button className="btn btn-glass" onClick={() => setModalType('fundraise')}>Apply Now</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Dynamic Modal */}
+      {/* Dynamic modal — modalType ke hisaab se alag alag form dikhega — volunteer, partner, ya internship */}
       {modalType && (
         <div className="volunteer-modal-overlay" onClick={closeModal}>
           <div className="volunteer-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -179,8 +187,8 @@ const GetInvolved = ({ onAddVolunteer, onAddPartner, onAddFundraiser }) => {
 
             {modalType === 'fundraise' && (
               <>
-                <h2>Start a Campaign</h2>
-                <p>Dedicate your special days to raise funds for education.</p>
+                <h2>Apply for Internship</h2>
+                <p>Join our internship program to gain professional experience and support local communities.</p>
                 <form onSubmit={handleSubmit} className="volunteer-form">
                   <div className="form-group">
                     <label>Your Full Name *</label>
@@ -191,25 +199,36 @@ const GetInvolved = ({ onAddVolunteer, onAddPartner, onAddFundraiser }) => {
                     <input type="email" required placeholder="john@example.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                   </div>
                   <div className="form-group">
-                    <label>Campaign Type *</label>
+                    <label>Phone Number (Optional)</label>
+                    <input type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Internship Area *</label>
                     <select required value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})}>
-                      <option value="">Select type</option>
-                      <option value="Birthday">Birthday</option>
-                      <option value="Memorial">Memorial</option>
-                      <option value="Challenge/Marathon">Challenge / Marathon</option>
-                      <option value="Wedding/Anniversary">Wedding / Anniversary</option>
+                      <option value="">Select an area</option>
+                      <option value="Social Media & Marketing">Social Media & Marketing</option>
+                      <option value="Content & PR">Content & PR</option>
+                      <option value="Event Management">Event Management</option>
+                      <option value="Teaching & Mentorship">Teaching & Mentorship</option>
+                      <option value="Community Development">Community Development</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Target Amount (₹) *</label>
-                    <input type="number" required placeholder="50000" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} />
+                    <label>Duration *</label>
+                    <select required value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})}>
+                      <option value="">Select duration</option>
+                      <option value="1">1 Month</option>
+                      <option value="2">2 Months</option>
+                      <option value="3">3 Months</option>
+                      <option value="6">6 Months</option>
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label>Campaign Description (Optional)</label>
-                    <textarea rows="3" placeholder="Tell us about your campaign..." value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
+                    <label>Why do you want to join? (Optional)</label>
+                    <textarea rows="3" placeholder="Tell us about yourself and why you'd like to intern with us..." value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
                   </div>
-                  <button type="submit" className="btn btn-primary submit-btn">Start Campaign</button>
+                  <button type="submit" className="btn btn-primary submit-btn">Submit Application</button>
                 </form>
               </>
             )}

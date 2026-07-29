@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight request
+  // OPTIONS request aata hai browser se pehle — CORS preflight hai, isko 'ok' bol do
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -37,7 +37,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "NGO Portal <onboarding@resend.dev>", // Resend sandbox testing sender
+        from: "NGO Portal <onboarding@resend.dev>", // Resend ka sandbox sender — production mein apna verified domain use karna
         to: toEmail || "leader@weareyouthfoundation.com",
         subject: `New Volunteer Application: ${volunteer.name}`,
         html: `

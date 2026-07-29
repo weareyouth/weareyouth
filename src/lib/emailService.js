@@ -5,14 +5,13 @@ const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 /**
- * Sends a volunteer notification email using EmailJS.
- * @param {Object} volunteer - The registered volunteer details (name, email, phone, role, message)
+ * Yeh function EmailJS ke through ek notification email bhejta hai jab bhi koi volunteer register karta hai.
+ * @param {Object} volunteer - Volunteer ka poora detail object — naam, email, phone, role, aur message
  */
 export const sendVolunteerNotification = async (volunteer) => {
   try {
     if (!serviceId || !templateId || !publicKey) {
-      console.warn("EmailJS credentials missing from environment variables!");
-      return null;
+      throw new Error("EmailJS credentials (VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, or VITE_EMAILJS_PUBLIC_KEY) are missing from your environment variables!");
     }
 
     const templateParams = {

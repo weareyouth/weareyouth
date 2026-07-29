@@ -57,8 +57,22 @@
 .focus-content p {
   color: var(--text-gray);
   font-size: 15px;
-  margin-bottom: 20px;
   line-height: 1.6;
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+.focus-card-elegant:hover .focus-content p {
+  max-height: 100px;
+  opacity: 1;
+  margin-bottom: 20px;
 }
 
 .btn-link {

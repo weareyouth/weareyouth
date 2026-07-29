@@ -1,10 +1,36 @@
+/* Horizontal scrolling slider container */
+.stories-scroll-container {
+  overflow-x: auto;
+  padding: 10px 5px 30px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+  width: 100%;
+}
+
+.stories-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.stories-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 174, 239, 0.05);
+  border-radius: 10px;
+}
+
+.stories-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
 .stories-grid-elegant {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 30px;
+  width: max-content;
 }
 
 .story-card-elegant {
+  flex: 0 0 380px;
+  scroll-snap-align: start;
   background-color: var(--bg-white);
   border-radius: var(--border-radius-lg);
   padding: 40px;
@@ -75,14 +101,76 @@
   z-index: 1;
 }
 
-@media (max-width: 992px) {
-  .stories-grid-elegant {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* Submission Modal styling */
+.story-submit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
 }
 
+.story-submit-modal {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: slideUp 0.3s ease;
+  color: var(--text-dark);
+}
+
+.story-submit-modal h3 {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.story-submit-modal p {
+  color: var(--text-gray);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-gray);
+  transition: var(--transition);
+}
+
+.modal-close-btn:hover {
+  color: var(--primary);
+}
+
+.story-upload-zone:hover {
+  border-color: var(--primary) !important;
+  background-color: rgba(0, 174, 239, 0.03) !important;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .stories-grid-elegant {
-    grid-template-columns: 1fr;
+  .story-card-elegant {
+    flex: 0 0 300px;
+    padding: 30px 24px;
+  }
+  .story-submit-modal {
+    padding: 30px 20px;
   }
 }

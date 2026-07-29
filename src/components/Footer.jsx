@@ -6,7 +6,7 @@ const Footer = ({ siteSettings }) => {
   const phone = siteSettings?.numbers || '+91 80903 34855';
   const email = siteSettings?.email || 'contact@weareyouthfoundation.com';
   
-  // Clean phone number for WhatsApp links (leave only digits)
+  // Phone number se sab non-digits hata do — WhatsApp link mein sirf numbers chahiye
   const cleanPhone = phone.replace(/\D/g, '');
 
   return (
@@ -14,7 +14,7 @@ const Footer = ({ siteSettings }) => {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-col brand-col">
-            <h2 className="footer-logo">We Are Youth<br/><span className="text-gold">Foundation</span></h2>
+            <h2 className="footer-logo" onClick={() => window.location.hash = '#'} style={{ cursor: 'pointer' }}>We Are Youth<br/><span className="text-gold">Foundation</span></h2>
             <p className="footer-desc">
               Empowering youth, transforming communities. Building a legacy of excellence, leadership, and positive change.
             </p>
@@ -31,7 +31,9 @@ const Footer = ({ siteSettings }) => {
             <ul>
               <li><a href="#about">Our Story</a></li>
               <li><a href="#programs">Our Programs</a></li>
+              <li><a href="#team">Our Team</a></li>
               <li><a href="#impact">Our Impact</a></li>
+              <li><a href="#all-blogs">Our Blog</a></li>
               <li><a href="#gallery">Gallery</a></li>
               <li><a href="#contact">Contact</a></li>
             </ul>
@@ -52,7 +54,7 @@ const Footer = ({ siteSettings }) => {
             <p>Join our elegant newsletter to receive the latest updates on our initiatives.</p>
             <form className="newsletter-form-elegant">
               <input type="email" placeholder="Email Address" required />
-              <button type="submit" className="btn btn-gold">Subscribe</button>
+              <button type="submit" className="btn btn-primary">Subscribe</button>
             </form>
           </div>
         </div>

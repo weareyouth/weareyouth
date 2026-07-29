@@ -129,7 +129,7 @@
   display: inline-block;
   padding: 4px 14px;
   border-radius: 50px;
-  background: rgba(212, 175, 55, 0.85);
+  background: rgba(245, 158, 11, 0.85);
   color: white;
   font-size: 11px;
   font-weight: 600;
@@ -290,11 +290,11 @@
 }
 
 .lightbox-prev {
-  left: -80px;
+  left: 40px;
 }
 
 .lightbox-next {
-  right: -80px;
+  right: 40px;
 }
 
 /* Close Button */
@@ -319,7 +319,7 @@
 }
 
 .lightbox-close:hover {
-  background: rgba(212, 175, 55, 0.6);
+  background: rgba(245, 158, 11, 0.6);
   transform: rotate(90deg) scale(1.1);
 }
 
@@ -349,8 +349,8 @@
   .gallery-item:nth-child(5) {
     grid-column: span 1;
   }
-  .lightbox-prev { left: -60px; }
-  .lightbox-next { right: -60px; }
+  .lightbox-prev { left: 24px; }
+  .lightbox-next { right: 24px; }
 }
 
 @media (max-width: 768px) {
@@ -372,8 +372,8 @@
     padding: 8px 16px;
     font-size: 12px;
   }
-  .lightbox-prev { left: 10px; }
-  .lightbox-next { right: 10px; }
+  .lightbox-prev { left: 16px; }
+  .lightbox-next { right: 16px; }
   .lightbox-nav {
     width: 40px;
     height: 40px;

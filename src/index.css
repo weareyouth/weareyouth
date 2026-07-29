@@ -3,15 +3,15 @@
 @import "tailwindcss";
 
 :root {
-  /* We Are Youth Foundation Colors */
-  --primary: #00aeef; /* Vibrant Cyan */
-  --primary-light: #33bff2; /* Light Cyan */
-  --primary-dark: #007ea8; /* Dark Cyan */
+  /* Yeh NGO ke main brand colors hain — inhe CSS variables ke roop mein define kiya hai taaki baar baar repeat na karna pade */
+  --primary: #00aeef; /* Main cyan color — logo aur buttons mein yahi use hota hai */
+  --primary-light: #33bff2; /* Thoda lighter cyan — hover effects mein kaam aata hai */
+  --primary-dark: #007ea8; /* Darker cyan — headings aur dark sections ke liye */
   
-  /* Elegant Accents */
-  --accent-gold: #D4AF37; /* Soft Gold */
+  /* Accent colors — yeh secondary colors hain jo design ko premium look dete hain */
+  --accent-gold: #F59E0B; /* Gold/amber color — subtitles aur highlights ke liye, bahut premium lagta hai */
   --accent-gold-light: #FCD34D;
-  --accent-gold-hover: #B4952F;
+  --accent-gold-hover: #D97706;
   
   --text-dark: #0F172A; /* Slate */
   --text-gray: #475569;
@@ -33,6 +33,11 @@
   --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -46,6 +51,7 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
@@ -72,6 +78,7 @@ a:hover {
 
 .section {
   padding: 100px 0;
+  scroll-margin-top: 110px; /* Fixed header ki height ke barabar offset — warna section header ke neeche chup jaata */
 }
 
 .section-bg-light {
@@ -82,14 +89,14 @@ a:hover {
   text-align: center;
 }
 
-/* Button Base */
+/* Button ka base style — saare buttons isko inherit karte hain, ek jagah se control hoga sab */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 14px 32px;
   font-weight: 500;
-  border-radius: 50px; /* Pill shape for elegance */
+  border-radius: 50px; /* Pill shape — yeh rounded look buttons ko premium aur modern banata hai */
   cursor: pointer;
   transition: var(--transition);
   border: none;
@@ -99,7 +106,7 @@ a:hover {
   text-decoration: none;
 }
 
-/* Solid Buttons */
+/* Solid buttons — yeh filled background wale buttons hain, CTAs ke liye best choice */
 .btn-primary {
   background-color: var(--primary);
   color: var(--bg-white) !important;
@@ -115,16 +122,29 @@ a:hover {
 .btn-gold {
   background-color: var(--accent-gold);
   color: var(--bg-white) !important;
-  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
 }
 
 .btn-gold:hover {
   background-color: var(--accent-gold-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 
-/* Outline Buttons */
+.btn-white {
+  background-color: var(--bg-white);
+  color: var(--primary-dark) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.btn-white:hover {
+  background-color: var(--bg-light);
+  color: var(--primary) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Outline buttons — border only, background transparent — secondary actions ke liye use karte hain */
 .btn-outline-light {
   background-color: transparent;
   border: 2px solid var(--bg-white);
@@ -149,7 +169,7 @@ a:hover {
   transform: translateY(-2px);
 }
 
-/* Glassmorphism Buttons */
+/* Glassmorphism buttons — translucent, blurred background wale buttons — hero sections par bahut achhe lagte hain */
 .btn-glass {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
@@ -180,7 +200,7 @@ a:hover {
   transform: translateY(-2px);
 }
 
-/* Typography Helpers */
+/* Typography helper classes — section titles aur subtitles consistently styling ke liye */
 .section-title {
   font-size: 42px;
   color: var(--primary-dark);

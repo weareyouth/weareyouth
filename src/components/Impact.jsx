@@ -1,6 +1,66 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Impact.css';
 
+const AnimatedCounter = ({ value, isVisible }) => {
+  const [count, setCount] = useState(0);
+
+  const stringVal = String(value || '0');
+  const numericString = stringVal.replace(/[^0-9]/g, '');
+  const targetNumber = parseInt(numericString, 10) || 0;
+  
+  const suffixMatch = stringVal.match(/[^0-9,]+$/);
+  const suffix = suffixMatch ? suffixMatch[0] : '';
+  const hasComma = stringVal.includes(',');
+
+  useEffect(() => {
+    if (!isVisible) {
+      setCount(0);
+      return;
+    }
+
+    let start = 0;
+    const end = targetNumber;
+    if (start === end) {
+      setCount(end);
+      return;
+    }
+
+    const duration = 2000; // 2 seconds mein counter animation complete hogi — feel bahut smooth aati hai
+    const startTime = performance.now();
+
+    const updateCount = (currentTime) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      
+      // Easing function use kar rahe hain — counter pehle tezi se chalega, phir dheere dheere slow hoga (easeOutQuad)
+      const easeProgress = progress * (2 - progress);
+      const currentVal = Math.floor(easeProgress * (end - start) + start);
+
+      setCount(currentVal);
+
+      if (progress < 1) {
+        requestAnimationFrame(updateCount);
+      }
+    };
+
+    requestAnimationFrame(updateCount);
+  }, [isVisible, targetNumber]);
+
+  const formatNumber = (num) => {
+    if (hasComma) {
+      return num.toLocaleString();
+    }
+    return num.toString();
+  };
+
+  return (
+    <>
+      {formatNumber(count)}
+      {suffix && <span className="text-gold">{suffix}</span>}
+    </>
+  );
+};
+
 const Impact = ({ impactStats }) => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
@@ -44,7 +104,10 @@ const Impact = ({ impactStats }) => {
         <div className="stats-grid-elegant">
           {stats.map((stat, index) => (
             <div key={index} className={`stat-card-elegant glass-panel ${isVisible ? 'animate-up' : ''}`} style={{animationDelay: `${index * 0.1}s`}}>
-              <h3 className="stat-value">{stat.value}<span className="text-gold">{stat.suffix}</span></h3>
+              <h3 className="stat-value">
+                <AnimatedCounter value={stat.value} isVisible={isVisible} />
+                {stat.suffix && <span className="text-gold">{stat.suffix}</span>}
+              </h3>
               <p className="stat-label">{stat.label}</p>
             </div>
           ))}

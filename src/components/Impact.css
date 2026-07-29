@@ -15,7 +15,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(15, 23, 42, 0.85); /* Slate overlay */
+  background-color: rgba(0, 60, 90, 0.88); /* Deep transparent blue overlay */
   z-index: 1;
 }
 
@@ -51,10 +51,10 @@
   border-radius: var(--border-radius-lg);
   opacity: 0;
   transform: translateY(30px);
-  /* Use glass panel styles with slight adjustment */
-  background: rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  /* Use glass panel styles with slightly higher contrast */
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .stat-card-elegant:nth-child(2) {
@@ -89,9 +89,10 @@
 .stat-label {
   font-family: var(--font-body);
   font-size: 16px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  color: #ffffff;
   letter-spacing: 1px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 992px) {

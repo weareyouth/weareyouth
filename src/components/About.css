@@ -10,36 +10,32 @@
   height: 600px;
 }
 
-.img-wrapper {
-  position: absolute;
+.single-img-wrapper {
+  width: 100%;
+  height: 100%;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
 
-.img-1 {
-  width: 70%;
-  height: 70%;
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-.img-2 {
-  width: 60%;
-  height: 60%;
-  bottom: 0;
-  right: 0;
-  z-index: 2;
-  padding: 10px; /* creating a border effect with glass panel */
-  background: var(--bg-white);
-}
-
-.img-wrapper img {
+.about-single-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-lg);
+  transition: transform 0.5s ease;
+}
+
+.about-single-img:hover {
+  transform: scale(1.03);
+}
+
+.about-images .experience-badge {
+  top: auto;
+  left: auto;
+  bottom: 30px;
+  right: 30px;
+  transform: none;
 }
 
 .experience-badge {
@@ -103,7 +99,7 @@
 .icon-gold {
   font-size: 28px;
   color: var(--accent-gold);
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(245, 158, 11, 0.1);
   width: 60px;
   height: 60px;
   display: flex;

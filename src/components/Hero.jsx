@@ -30,7 +30,7 @@ const Hero = ({ onDonateClick }) => {
         <h1 className="hero-title">Empowering Youth,<br/><span className="text-gold">Transforming Communities</span></h1>
         <p className="hero-text">Join us in our mission to inspire, educate, and uplift the next generation. Together, we can create a legacy of positive change and sustainable growth.</p>
         <div className="hero-buttons">
-          <button className="btn btn-gold" onClick={onDonateClick}>Donate to the Cause</button>
+          <button className="btn btn-white" onClick={onDonateClick}>Donate to the Cause</button>
           <button className="btn btn-glass" onClick={() => { document.getElementById('impact')?.scrollIntoView({ behavior: 'smooth' }); }}>Discover Our Impact</button>
         </div>
       </div>

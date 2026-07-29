@@ -2,109 +2,166 @@ import React, { useState, useEffect } from 'react';
 import './DonationModal.css';
 
 /**
- * QR Code & UPI Donation Workflow
+ * Razorpay Donation Workflow
  * ──────────────────────────────
- * This allows donors to pay directly using any UPI App (GPay, PhonePe, Paytm, BHIM)
- * by scanning a dynamically generated QR Code containing the chosen donation amount.
- * 
- * After scanning, the donor enters their 12-digit transaction ID / UPI Ref Number.
- * The submission goes to the Admin Dashboard for verification and approval.
+ * Step 1 → Donor fills in name, email, phone, amount, campaign.
+ * Step 2 → Razorpay Checkout popup opens automatically.
+ *           On success  → payment_id is captured → saved to Supabase → Step 3 (receipt).
+ *           On dismiss  → donor is returned to Step 1.
+ *
+ * Requirements:
+ *   • Razorpay JS SDK loaded in index.html:
+ *       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+ *   • VITE_RAZORPAY_KEY_ID set in .env.local  (test key starts with rzp_test_…)
  */
-const UPI_ID = 'UJJ83981816499@Ujjivan'; // Foundation UPI ID
-const PAYEE_NAME = 'We Are Youth Foundation';
 
-const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDonationSubmission }) => {
-  const [step, setStep] = useState(1); // 1 = form, 2 = QR code scanner, 3 = success
-  const [amount, setAmount] = useState('1000');
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || '';
+const PAYEE_NAME      = 'We Are Youth Foundation';
+
+const DonationModal = ({
+  isOpen,
+  onClose,
+  campaigns,
+  initialCampaignId,
+  onProcessDonation,
+  onAddDonationSubmission,
+}) => {
+  const [step, setStep]               = useState(1); // 1=form  2=processing  3=success
+  const [amount, setAmount]           = useState('1000');
   const [customAmount, setCustomAmount] = useState('');
-  const [campaignId, setCampaignId] = useState('');
-  const [donorName, setDonorName] = useState('');
-  const [donorEmail, setDonorEmail] = useState('');
-  const [donorPhone, setDonorPhone] = useState('');
-  const [transactionId, setTransactionId] = useState('');
+  const [campaignId, setCampaignId]   = useState('');
+  const [donorName, setDonorName]     = useState('');
+  const [donorEmail, setDonorEmail]   = useState('');
+  const [donorPhone, setDonorPhone]   = useState('');
+  const [paymentId, setPaymentId]     = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /* ── sync campaign selection with parent ── */
   useEffect(() => {
     if (initialCampaignId) {
       setCampaignId(initialCampaignId);
     } else if (campaigns && campaigns.length > 0) {
       setCampaignId(campaigns[0].id);
     }
-    // Reset inputs when modal opens
     if (isOpen) {
       setStep(1);
-      setTransactionId('');
+      setPaymentId('');
     }
   }, [initialCampaignId, campaigns, isOpen]);
 
   if (!isOpen) return null;
 
-  const getFinalAmount = () => {
-    return amount === 'custom' ? parseInt(customAmount) : parseInt(amount);
-  };
+  /* ── helpers ── */
+  const getFinalAmount = () =>
+    amount === 'custom' ? parseInt(customAmount) || 0 : parseInt(amount) || 0;
 
-  const handleAmountClick = (val) => {
-    setAmount(val);
-    setCustomAmount('');
-  };
+  const getSelectedCampaign = () =>
+    campaigns.find(c => c.id === parseInt(campaignId)) || campaigns[0];
 
-  const handleCustomAmountChange = (e) => {
-    setCustomAmount(e.target.value);
-    setAmount('custom');
-  };
-
-  const getSelectedCampaign = () => {
-    return campaigns.find(c => c.id === parseInt(campaignId)) || campaigns[0];
-  };
-
+  /* ── Step 1 submit ── */
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const finalAmount = getFinalAmount();
-    if (!finalAmount || finalAmount <= 0) {
-      alert('Please enter a valid amount');
-      return;
-    }
-    if (!donorName.trim()) {
-      alert('Please enter your name');
-      return;
-    }
-    if (!donorEmail.trim()) {
-      alert('Please enter your email');
-      return;
-    }
-    if (!donorPhone.trim()) {
-      alert('Please enter your phone number');
-      return;
-    }
-    setStep(2); // Go to QR Code Scanner step
+    if (!finalAmount || finalAmount <= 0)    { alert('Please enter a valid amount'); return; }
+    if (!donorName.trim())                   { alert('Please enter your name'); return; }
+    if (!donorEmail.trim())                  { alert('Please enter your email'); return; }
+    if (!donorPhone.trim())                  { alert('Please enter your phone number'); return; }
+    openRazorpay();
   };
 
-  const handlePaymentVerification = (e) => {
-    e.preventDefault();
-    if (!transactionId.trim() || transactionId.length !== 12 || isNaN(transactionId)) {
-      alert('Please enter a valid 12-digit UPI Reference Number / Transaction ID');
+  /* ── Launch Razorpay Checkout ── */
+  const openRazorpay = () => {
+    const finalAmount = getFinalAmount();
+    const campaign    = getSelectedCampaign();
+
+    if (!window.Razorpay) {
+      alert('Payment gateway failed to load. Please refresh the page and try again.');
       return;
     }
 
-    setIsSubmitting(true);
+    if (!RAZORPAY_KEY_ID) {
+      alert('Razorpay Key ID is not configured. Please add VITE_RAZORPAY_KEY_ID to your .env.local file.');
+      return;
+    }
 
-    // Simulate verification submit network delay
-    setTimeout(() => {
-      const selectedCampaign = getSelectedCampaign();
-      onAddDonationSubmission({
-        id: Date.now(),
+    setStep(2); // show "Processing…" overlay while Razorpay popup loads
+
+    const options = {
+      key:          RAZORPAY_KEY_ID,
+      amount:       finalAmount * 100,          // Razorpay expects paise
+      currency:     'INR',
+      name:         PAYEE_NAME,
+      description:  `Donation – ${campaign?.title || 'General Fund'}`,
+      image:        '/src/assets/spareLogo.png',
+
+      // ── Prefill donor info ──
+      prefill: {
+        name:    donorName,
+        email:   donorEmail,
+        contact: donorPhone,
+      },
+
+      notes: {
+        campaign_title: campaign?.title || 'General Fund',
+        campaign_id:    campaign?.id || '',
+      },
+
+      theme: { color: '#16a34a' },
+
+      modal: {
+        backdropclose: false,
+        escape:        false,
+        ondismiss: () => {
+          // Donor closed the popup without paying → return to form
+          setStep(1);
+        },
+      },
+
+      // ── On successful payment ──
+      handler: async (response) => {
+        const pid = response.razorpay_payment_id;
+        setPaymentId(pid);
+        await saveAndComplete(pid, campaign, finalAmount);
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', (response) => {
+      console.error('Razorpay payment failed:', response.error);
+      alert(`Payment failed: ${response.error.description}`);
+      setStep(1);
+    });
+    rzp.open();
+  };
+
+  /* ── Save to Supabase and update campaign progress ── */
+  const saveAndComplete = async (pid, campaign, finalAmount) => {
+    setIsSubmitting(true);
+    try {
+      await onAddDonationSubmission({
+        id:            Date.now(),
         donorName,
-        email: donorEmail,
-        phone: donorPhone,
-        amount: getFinalAmount(),
-        campaignTitle: selectedCampaign ? selectedCampaign.title : 'General Fund',
-        transactionId: transactionId.trim(),
-        status: 'Pending',
-        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        email:         donorEmail,
+        phone:         donorPhone,
+        amount:        finalAmount,
+        campaignTitle: campaign?.title || 'General Fund',
+        transactionId: pid,      // razorpay_payment_id stored as transactionId
+        status:        'Verified',
+        date:          new Date().toLocaleDateString('en-IN', {
+                         day: 'numeric', month: 'short', year: 'numeric',
+                       }),
       });
+
+      // Update campaign funded amount
+      if (campaign?.id && onProcessDonation) {
+        await onProcessDonation(campaign.id, finalAmount);
+      }
+    } catch (err) {
+      console.error('Error saving donation:', err);
+    } finally {
       setIsSubmitting(false);
-      setStep(3); // Show success screen
-    }, 1500);
+      setStep(3); // show receipt
+    }
   };
 
   const handleClose = () => {
@@ -112,15 +169,12 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
     onClose();
   };
 
-  const campaign = getSelectedCampaign();
+  const campaign    = getSelectedCampaign();
   const finalAmount = getFinalAmount();
 
-  // Generate standard UPI payload link
-  const upiPayload = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${finalAmount}&cu=INR&tn=${encodeURIComponent('Donation ' + (campaign ? campaign.title : ''))}`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(upiPayload)}`;
-
+  /* ════════════════════════════════════════════ RENDER ════════════════════════════════════════════ */
   return (
-    <div className="donation-modal-overlay" onClick={handleClose}>
+    <div className="donation-modal-overlay" onClick={step === 1 ? handleClose : undefined}>
       <div className="donation-modal-content" onClick={e => e.stopPropagation()}>
         <button className="close-btn" onClick={handleClose}>&times;</button>
 
@@ -132,6 +186,7 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
             <p>Your contribution helps us create a better world for youth everywhere.</p>
 
             <form onSubmit={handleFormSubmit} className="donation-form">
+              {/* Campaign selector */}
               <div className="form-group">
                 <label>Select Campaign</label>
                 <select
@@ -145,6 +200,7 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                 </select>
               </div>
 
+              {/* Amount picker */}
               <div className="form-group">
                 <label>Select Amount (₹)</label>
                 <div className="amount-options">
@@ -153,7 +209,7 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                       type="button"
                       key={val}
                       className={`amount-btn ${amount === val ? 'active' : ''}`}
-                      onClick={() => handleAmountClick(val)}
+                      onClick={() => { setAmount(val); setCustomAmount(''); }}
                     >
                       ₹{parseInt(val).toLocaleString('en-IN')}
                     </button>
@@ -165,7 +221,7 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                     type="number"
                     placeholder="Custom Amount"
                     value={customAmount}
-                    onChange={handleCustomAmountChange}
+                    onChange={(e) => { setCustomAmount(e.target.value); setAmount('custom'); }}
                     onFocus={() => setAmount('custom')}
                     className="custom-amount-input"
                     min="1"
@@ -173,6 +229,7 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                 </div>
               </div>
 
+              {/* Donor info */}
               <div className="form-group">
                 <label>Full Name *</label>
                 <input
@@ -199,14 +256,14 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                 <label>Phone Number *</label>
                 <input
                   type="tel"
-                  placeholder="+91 80903 34855"
+                  placeholder="+91 98765 43210"
                   value={donorPhone}
                   onChange={(e) => setDonorPhone(e.target.value)}
                   required
                 />
               </div>
 
-              {/* Payment Summary */}
+              {/* Summary */}
               <div className="payment-summary">
                 <div className="summary-row">
                   <span>Campaign</span>
@@ -221,108 +278,46 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
               </div>
 
               <button type="submit" className="btn btn-primary submit-btn">
-                Continue to Payment ➔
+                Proceed to Pay ➔
               </button>
 
               <div className="payment-trust">
-                <span className="trust-badge">🛡️ Secure UPI Payment Portal</span>
+                <span className="trust-badge">🔒 Secured by Razorpay</span>
               </div>
             </form>
           </>
         )}
 
-        {/* ──── STEP 2: UPI QR Code & Verification Input ──── */}
+        {/* ──── STEP 2: Processing / Razorpay popup open ──── */}
         {step === 2 && (
-          <div className="qr-donation-section">
-            <div className="modal-icon" style={{ fontSize: '32px', marginBottom: '8px' }}>📲</div>
-            <h2>Scan QR to Donate</h2>
-            <p className="qr-helper-text">
-              Scan using Google Pay, PhonePe, Paytm, BHIM, or any UPI banking app.
+          <div className="payment-status processing" style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div className="modal-icon" style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+            <h2>Opening Payment Gateway…</h2>
+            <p style={{ color: 'var(--text-gray)', marginTop: '8px' }}>
+              Complete the payment in the Razorpay window.<br />
+              Do not close or refresh this page.
             </p>
-
-            <div className="qr-container-card" style={{ padding: '0', overflow: 'hidden' }}>
-              <div className="ujjivan-pay-header" style={{
-                background: '#044343', /* Dark teal green matching Ujjivan Pay */
-                color: 'white',
-                padding: '12px 16px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontWeight: 'bold',
-                fontSize: '18px',
-                letterSpacing: '1px',
-                gap: '4px',
-                fontFamily: 'sans-serif'
-              }}>
-                <span style={{ color: '#f97316' }}>UJJIVAN</span>
-                <span style={{ color: '#ffffff' }}>PAY</span>
-              </div>
-
-              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                <div className="qr-amount-header">
-                  <span className="qr-amount-title">Donation Amount</span>
-                  <span className="qr-amount-value">₹{finalAmount.toLocaleString('en-IN')}</span>
-                </div>
-                
-                <div className="qr-wrapper">
-                  <img src={qrCodeUrl} alt="UPI QR Code" className="upi-qr-image" />
-                  <span className="qr-scan-badge">Scan & Pay</span>
-                </div>
-
-                <div className="upi-info-details">
-                  <div>
-                    <span className="info-label">Payee:</span>
-                    <span className="info-value">{PAYEE_NAME}</span>
-                  </div>
-                  <div>
-                    <span className="info-label">UPI ID:</span>
-                    <span className="info-value" style={{ textTransform: 'none' }}>{UPI_ID}</span>
-                  </div>
-                </div>
-              </div>
+            <div style={{ marginTop: '32px' }}>
+              <div className="spinner" style={{
+                width: '40px', height: '40px',
+                border: '4px solid #e5e7eb',
+                borderTop: '4px solid #16a34a',
+                borderRadius: '50%',
+                animation: 'spin 0.9s linear infinite',
+                margin: '0 auto',
+              }} />
             </div>
-
-            <form onSubmit={handlePaymentVerification} className="verification-form">
-              <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: 'var(--text-dark)' }}>
-                  Enter UPI Ref No. / Transaction ID *
-                </label>
-                <input
-                  type="text"
-                  maxLength="12"
-                  placeholder="Enter 12-digit number (e.g. 518392018374)"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value.replace(/\D/g, ''))} // numbers only
-                  required
-                  style={{ textAlign: 'center', letterSpacing: '2px', fontSize: '15px' }}
-                />
-                <small className="help-text">
-                  Usually found in your transaction details screen after a successful payment.
-                </small>
-              </div>
-
-              <button type="submit" className="btn btn-primary submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <span className="spinner" style={{ width: '16px', height: '16px', display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }}></span>
-                    Submitting...
-                  </>
-                ) : (
-                  'Confirm & Submit Donation'
-                )}
-              </button>
-
-              <div className="qr-actions">
-                <button type="button" className="btn btn-outline" onClick={() => setStep(1)} disabled={isSubmitting}>
-                  ◀ Back
-                </button>
-              </div>
-            </form>
+            <button
+              className="btn btn-outline"
+              onClick={() => setStep(1)}
+              style={{ marginTop: '32px' }}
+            >
+              ◀ Cancel & Go Back
+            </button>
           </div>
         )}
 
-        {/* ──── STEP 3: Verification Success Receipt ──── */}
+        {/* ──── STEP 3: Success Receipt ──── */}
         {step === 3 && (
           <div className="payment-status success">
             <div className="status-animation">
@@ -330,8 +325,8 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                 <div className="check-icon">✓</div>
               </div>
             </div>
-            <h2>Donation Submitted! 🎉</h2>
-            <p>Thank you! Your transaction details have been logged for verification.</p>
+            <h2>Payment Successful! 🎉</h2>
+            <p>Thank you, {donorName}! Your donation has been confirmed.</p>
 
             <div className="receipt-card">
               <div className="receipt-row">
@@ -343,8 +338,10 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
                 <span className="receipt-value">{campaign?.title}</span>
               </div>
               <div className="receipt-row">
-                <span className="receipt-label">Ref ID</span>
-                <span className="receipt-value receipt-id" style={{ letterSpacing: '1px' }}>{transactionId}</span>
+                <span className="receipt-label">Payment ID</span>
+                <span className="receipt-value receipt-id" style={{ letterSpacing: '0.5px', fontSize: '12px' }}>
+                  {paymentId}
+                </span>
               </div>
               <div className="receipt-row">
                 <span className="receipt-label">Donor</span>
@@ -352,16 +349,20 @@ const DonationModal = ({ isOpen, onClose, campaigns, initialCampaignId, onAddDon
               </div>
               <div className="receipt-row">
                 <span className="receipt-label">Status</span>
-                <span className="receipt-value" style={{ color: '#d97706', fontWeight: 'bold' }}>Pending Verification</span>
+                <span className="receipt-value" style={{ color: '#16a34a', fontWeight: 'bold' }}>
+                  ✅ Confirmed
+                </span>
               </div>
               <div className="receipt-row">
                 <span className="receipt-label">Date</span>
-                <span className="receipt-value">{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span className="receipt-value">
+                  {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
               </div>
             </div>
 
             <p className="receipt-note" style={{ fontSize: '13px', color: 'var(--text-gray)', margin: '15px 0' }}>
-              Once our finance team verifies the Reference ID, the donation will be approved and campaign progress will reflect your contribution.
+              A confirmation email has been sent to <strong>{donorEmail}</strong>. The campaign progress will update shortly.
             </p>
 
             <button className="btn btn-primary submit-btn" onClick={handleClose}>

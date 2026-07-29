@@ -48,7 +48,7 @@
 
 .highlight-card {
   background-color: var(--accent-gold);
-  box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 10px 40px rgba(245, 158, 11, 0.3);
   transform: scale(1.05);
 }
 
@@ -173,7 +173,7 @@
 .volunteer-form textarea:focus {
   outline: none;
   border-color: var(--accent-gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
 }
 
 .volunteer-form .submit-btn {

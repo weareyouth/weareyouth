@@ -1,0 +1,138 @@
+.team-section {
+  background-color: var(--bg-white);
+  padding: 100px 0;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 40px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.team-card-elegant {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: visible;
+  transition: var(--transition);
+}
+
+.team-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.team-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.team-card-elegant:hover .team-image {
+  transform: scale(1.08);
+}
+
+/* Hover Social Icons Overlay */
+.team-social-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 126, 168, 0.4); /* Primary dark with alpha */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+}
+
+.team-card-elegant:hover .team-social-overlay {
+  opacity: 1;
+}
+
+.team-social-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
+
+.team-social-icon:hover {
+  background: var(--accent-gold);
+  color: white;
+  transform: translateY(-4px);
+}
+
+/* Glassmorphism Info Box overlaying the bottom image edge */
+.team-info-card {
+  position: relative;
+  width: 90%;
+  margin: -60px auto 0 auto; /* Pull card up to overlay the image */
+  padding: 24px;
+  border-radius: 16px;
+  z-index: 5;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.team-card-elegant:hover .team-info-card {
+  transform: translateY(-8px);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.team-role-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.team-info-card h3 {
+  font-size: 20px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.team-info-card p {
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .team-grid {
+    gap: 60px; /* More gap vertically as boxes overlay */
+  }
+  
+  .team-image-wrapper {
+    height: 320px;
+  }
+}
